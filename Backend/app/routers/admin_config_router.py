@@ -1,0 +1,46 @@
+# app/routers/admin_config_router.py
+from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy.orm import Session
+from typing import List
+
+from app.core.database import get_db
+from app.services.admin_config_service import add_entity, list_entities, get_entity, update_entity, delete_entity
+from app.schemas.admin_schemas import ProductiveEntityCreate, ProductiveEntityResponse
+from app.utils.auth import require_roles
+
+router = APIRouter(prefix="/admin/config", tags=["Admin Config"])
+
+@router.post("/entities", response_model=ProductiveEntityResponse, status_code=status.HTTP_201_CREATED)
+def create_entity(payload: ProductiveEntityCreate, db: Session = Depends(get_db), _=Depends(require_roles("Admin"))):
+    try:
+        ent = add_entity(db, payload)
+        return ent
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+@router.get("/entities", response_model=List[ProductiveEntityResponse])
+def get_entities(db: Session = Depends(get_db), _=Depends(require_roles("Admin"))):
+    return list_entities(db)
+
+@router.get("/entities/{entity_id}", response_model=ProductiveEntityResponse)
+def get_single(entity_id: int, db: Session = Depends(get_db), _=Depends(require_roles("Admin"))):
+    ent = get_entity(db, entity_id)
+    if not ent:
+        raise HTTPException(status_code=404, detail="Not found")
+    return ent
+
+@router.patch("/entities/{entity_id}", response_model=ProductiveEntityResponse)
+def patch_entity(entity_id: int, payload: ProductiveEntityCreate, db: Session = Depends(get_db), _=Depends(require_roles("Admin"))):
+    try:
+        updated = update_entity(db, entity_id, payload.dict())
+        return updated
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+
+@router.delete("/entities/{entity_id}", status_code=status.HTTP_204_NO_CONTENT)
+def remove_entity(entity_id: int, db: Session = Depends(get_db), _=Depends(require_roles("Admin"))):
+    try:
+        delete_entity(db, entity_id)
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    return {}
