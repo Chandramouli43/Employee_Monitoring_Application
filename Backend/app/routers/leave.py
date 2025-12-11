@@ -7,18 +7,10 @@ from app.models.leave import Leave
 from app.models.employee import Employee
 from app.models.attendance import Attendance
 from app.utils.auth import get_current_user
+from app.core.database import get_db
 
 router = APIRouter(prefix="/leave", tags=["Leave Management"])
 
-
-# ─────────────────────────────────────────────
-# DB Session Dependency
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
 
 
 # ─────────────────────────────────────────────

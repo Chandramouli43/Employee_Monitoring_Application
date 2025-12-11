@@ -5,7 +5,7 @@ import app.core.database as database
 from datetime import date
 from app.schemas.projects import Notification, NotificationCreate
 
-router = APIRouter()
+router = APIRouter(prefix="/notificationmanagement", tags=["Notification Management"])
 
 get_db = database.get_db
 @router.post("/", response_model=Notification)

@@ -3,7 +3,7 @@ from typing import Optional
 import os
 
 from jose import JWTError, jwt
-from fastapi import HTTPException, Depends
+from fastapi import HTTPException, Depends ,Cookie, Header
 
 from sqlalchemy.orm import Session
 
@@ -18,7 +18,9 @@ SECRET_KEY = os.getenv("SECRET_KEY", "supersecretkey")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60
 
-bearer_scheme = HTTPBearer()   # used for docs and dependency
+
+
+bearer_scheme = HTTPBearer(auto_error=False)  
 
 # ---------------------------
 # JWT Functions
@@ -31,32 +33,68 @@ def create_access_token(email: str, role: str, expires_delta: Optional[timedelta
     payload = {"sub": email, "role": role, "exp": expire}
     return jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
 
+def get_current_user(
+    bearer: HTTPAuthorizationCredentials = Depends(bearer_scheme),
+    access_cookie: str | None = Cookie(default=None, alias="access_token"),
+    db: Session = Depends(get_db)
+):
+    """
+    Accept JWT from:
+    - Authorization: Bearer <token>
+    - Cookie: access_token=<token>
 
-def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(bearer_scheme), db: Session = Depends(get_db)):
-    token = credentials.credentials # Extract token from credentials
+    Returns the authenticated user object.
     """
-    Decode JWT and return the currently authenticated user.
-    """
+
+    # ------------------------------------------------------------------
+    # 1️⃣ Extract token from Header OR Cookie
+    # ------------------------------------------------------------------
+    token = None
+
+    if bearer and bearer.credentials:
+        token = bearer.credentials
+    elif access_cookie:
+        token = access_cookie
+
+    if not token:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+
+    # ------------------------------------------------------------------
+    # 2️⃣ Decode JWT
+    # ------------------------------------------------------------------
     credentials_exception = HTTPException(
         status_code=401, detail="Could not validate credentials"
     )
+
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         email: str = payload.get("sub")
         role: str = payload.get("role")
+
         if not email:
             raise credentials_exception
+
     except JWTError:
         raise credentials_exception
 
+    # ------------------------------------------------------------------
+    # 3️⃣ Lookup user in DB
+    # ------------------------------------------------------------------
     user = get_employee_by_email(db, email)
+
     if not user:
         raise credentials_exception
 
-    # ✅ Optional: Keep role in sync with database record
+    # ------------------------------------------------------------------
+    # 4️⃣ Keep role in sync (optional behavior you had)
+    # ------------------------------------------------------------------
     if role and user.role != role:
+        print(f"Syncing role for user {email}: {user.role} -> {role}")
         user.role = role
 
+    # ------------------------------------------------------------------
+    # 5️⃣ Return the database user object (same as your original logic)
+    # ------------------------------------------------------------------
     return user
 
 # ---------------------------
@@ -68,7 +106,9 @@ def require_roles(*roles: str):
     Usage:
         @router.get("/admin", dependencies=[Depends(require_roles("Admin"))])
     """
+
     def role_checker(current_user=Depends(get_current_user)):
+        print(f"Checking roles for user {current_user.email}: required={roles}, user_role={current_user.role}")
         if current_user.role not in roles:
             raise HTTPException(
                 status_code=403,

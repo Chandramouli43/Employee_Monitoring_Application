@@ -8,7 +8,6 @@ class EmployeeBase(BaseModel):
     first_name: str
     last_name: Optional[str] = None
     email: EmailStr
-    name:str
     role: Optional[str] = "Employee"
 
 # ---------------------------

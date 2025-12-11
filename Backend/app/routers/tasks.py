@@ -6,7 +6,7 @@ import app.core.database as database
 from app.schemas.projects import Task, TaskCreate
 
 
-router = APIRouter()
+router = APIRouter(prefix="/taskmanagement", tags=["Task Management"])
 
 get_db = database.get_db
 

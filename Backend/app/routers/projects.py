@@ -5,7 +5,7 @@ import app.core.database as database
 from app.schemas.projects import Project, ProjectCreate
 
 
-router = APIRouter()
+router = APIRouter( prefix="/projectmanagement", tags=["Project Management"])
 
 get_db = database.get_db
 

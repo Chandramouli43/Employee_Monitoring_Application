@@ -27,6 +27,7 @@ def register_employee(
     db: Session = Depends(get_db),
     _: object = Depends(require_roles("Admin")),
 ):
+    print(employee,"iam employee")
     existing = get_employee_by_email(db, employee.email)
     if existing:
         raise HTTPException(status_code=400, detail="Email already exists")

@@ -4,53 +4,15 @@ from datetime import datetime, timezone, date
 from pydantic import BaseModel
 from typing import Optional, List
 from sqlalchemy import func
-
 from app.core.database import SessionLocal
 from app.models.attendance import Attendance
 from app.models.leave import Leave          # ✅ added to cross-check leave
 from app.models.employee import Employee
 from app.utils.auth import get_current_user
+from app.schemas.attendance import AttendanceResponse
+from app.core.database import get_db
 
 router = APIRouter(prefix="/attendance", tags=["Attendance Management"])
-
-# ─────────────────────────────────────────────
-# DB Session
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
-
-# ─────────────────────────────────────────────
-# Utility: Calculate total hours
-def calculate_hours(login: datetime, logout: datetime) -> str:
-    if not login or not logout:
-        return "0h 0m"
-    diff = logout - login
-    hours, remainder = divmod(diff.total_seconds(), 3600)
-    minutes = remainder // 60
-    return f"{int(hours)}h {int(minutes)}m"
-
-# ─────────────────────────────────────────────
-# Schemas
-class AttendanceUpdate(BaseModel):
-    login_time: Optional[datetime] = None
-    logout_time: Optional[datetime] = None
-    status: Optional[str] = None
-
-class AttendanceResponse(BaseModel):
-    id: int
-    date: date
-    login_time: Optional[datetime]
-    logout_time: Optional[datetime]
-    total_hours: str
-    status: str
-
-    class Config:
-        orm_mode = True
-
-# ─────────────────────────────────────────────
 # Punch IN (blocked if on leave)
 @router.post("/punch_in", response_model=AttendanceResponse)
 def punch_in(

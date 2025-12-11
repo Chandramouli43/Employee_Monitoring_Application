@@ -53,31 +53,31 @@ app.add_middleware(
 # Include Routers
 # ---------------------------
 app.include_router(auth_router.router, prefix="/auth", tags=["auth"])
-app.include_router(employee_router.router, prefix="/employees", tags=["employees"])
-app.include_router(department_router.router, prefix="/departments", tags=["departments"])
-app.include_router(activity_router.router, prefix="/activities", tags=["activities"])
-app.include_router(productivity_router.router, prefix="/productivity", tags=["productivity"])
-app.include_router(screenshot_router.router, prefix="/screenshots", tags=["screenshots"])
-app.include_router(analytics_router.router, prefix="/analytics", tags=["analytics"])
-app.include_router(realtime_router.router, prefix="/realtime", tags=["realtime"])
-app.include_router(insights_router.router, prefix="/insights", tags=["insights"])
-app.include_router(alerts_router.router, prefix="/alerts", tags=["alerts"])
-app.include_router(settings_router.router, prefix="/settings", tags=["settings"])
-app.include_router(stats_router.router, prefix="/stats", tags=["stats"])
+app.include_router(employee_router.router, )
+app.include_router(department_router.router, )
+app.include_router(activity_router.router, )
+app.include_router(productivity_router.router, )
+app.include_router(screenshot_router.router, )
+app.include_router(analytics_router.router, )
+app.include_router(realtime_router.router, )
+app.include_router(insights_router.router, )
+app.include_router(alerts_router.router, )
+app.include_router(settings_router.router, )
+app.include_router(stats_router.router, )
 
 # Attendance Management
-app.include_router(attendance.router, prefix="/Attendance Management", tags=["Attendance Management"])
-app.include_router(leave.router, prefix="/Leave Management", tags=["Leave Management"])
+app.include_router(attendance.router,)
+app.include_router(leave.router, )
 
 # Project Management
-app.include_router(tasks.router, prefix="/Task Management", tags=["Task Management"])
-app.include_router(projects.router, prefix="/Project Management", tags=["Project Management"])
-app.include_router(notifications.router, prefix="/Notification Management", tags=["Notification Management"])
+app.include_router(tasks.router, )
+app.include_router(projects.router,)
+app.include_router(notifications.router, )
 
 # Reports
-app.include_router(admin_productivity_router.router, prefix="", tags=["admin"])
-app.include_router(admin_config_router.router, prefix="", tags=["admin"])
-app.include_router(admin_reports_router.router, prefix="", tags=["admin"])
+app.include_router(admin_productivity_router.router, )
+app.include_router(admin_config_router.router, )
+app.include_router(admin_reports_router.router, )
 
 
 # ---------------------------
