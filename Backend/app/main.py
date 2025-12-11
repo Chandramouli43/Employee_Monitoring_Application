@@ -2,11 +2,13 @@
 from fastapi import FastAPI
 from sqlalchemy.orm import Session
 from app.core.database import Base, engine, SessionLocal
+from fastapi.middleware.cors import CORSMiddleware
 from app.models import employee, department, team, activity, productivity, screenshot
 from app.services.employee_service import create_employee, get_employee_by_email
 from app.schemas.employee_schema import EmployeeCreate  # ✅ Ensure schema import
 from app.routers import (
     alerts_router,
+    department_router,
     employee_router,
     activity_router,
     productivity_router,
@@ -37,11 +39,22 @@ Base.metadata.create_all(bind=engine)
 # ---------------------------
 app = FastAPI(title="Employee activity and productivity tracking system")
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 # ---------------------------
 # Include Routers
 # ---------------------------
 app.include_router(auth_router.router, prefix="/auth", tags=["auth"])
 app.include_router(employee_router.router, prefix="/employees", tags=["employees"])
+app.include_router(department_router.router, prefix="/departments", tags=["departments"])
 app.include_router(activity_router.router, prefix="/activities", tags=["activities"])
 app.include_router(productivity_router.router, prefix="/productivity", tags=["productivity"])
 app.include_router(screenshot_router.router, prefix="/screenshots", tags=["screenshots"])
@@ -76,15 +89,15 @@ def create_default_admin():
     """
     db = SessionLocal()
     try:
-        admin = get_employee_by_email(db, "admin@example.com")
+        admin = get_employee_by_email(db, "sam@example.com")
         if not admin:
             # ✅ Matches EmployeeCreate schema fields
             admin_data = EmployeeCreate(
-                first_name="Admin",
-                last_name="User",
-                name="Admin User",
-                email="admin@example.com",
-                password="admin123",
+                first_name="sameer",
+                last_name="shaik",
+                name="sameer shaik",
+                email="sam@example.com",
+                password="sam123",
                 role="Admin",
             )
             create_employee(db, admin_data)

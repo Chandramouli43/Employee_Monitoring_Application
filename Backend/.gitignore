@@ -1,0 +1,95 @@
+# =========================
+# Python Bytecode & Cache
+# =========================
+__pycache__/
+*.py[cod]
+*$py.class
+
+# =========================
+# Virtual Environment
+# =========================
+venv/
+env/
+.venv/
+ENV/
+Backend.zip
+
+# =========================
+# Environment Variables
+# =========================
+.env
+.env.*
+!.env.example
+
+# =========================
+# Build & Distribution
+# =========================
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# =========================
+# Logs & Runtime
+# =========================
+logs/
+*.log
+*.pid
+
+# =========================
+# Database
+# =========================
+*.sqlite3
+*.db
+
+# =========================
+# Alembic
+# =========================
+alembic/versions/*.pyc
+
+# =========================
+# Docker
+# =========================
+*.tar
+docker_data/
+.dockerignore
+
+# =========================
+# Test & Coverage
+# =========================
+.coverage
+htmlcov/
+.pytest_cache/
+test-results/
+
+# =========================
+# IDEs & Editors
+# =========================
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# =========================
+# OS Files
+# =========================
+.DS_Store
+Thumbs.db
+
+# =========================
+# Jupyter Notebooks
+# =========================
+.ipynb_checkpoints
+
+# =========================
+# MyPy & Type Checking
+# =========================
+.mypy_cache/
+.dmypy.json
+
+
+# =========================
+# Media Uploads (Optional)
+# =========================
+media/
+uploads/
