@@ -6,7 +6,7 @@ class Department(Base):
     __tablename__ = "departments"
 
     id = Column(Integer, primary_key=True, index=True)
-    name = Column(String(120), unique=True, nullable=False)
+    department_name = Column(String(120), unique=True, nullable=False)
 
     # Relationships
     teams = relationship("Team", back_populates="department", cascade="all, delete-orphan")

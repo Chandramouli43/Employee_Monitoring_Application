@@ -141,7 +141,7 @@ def get_my_leaves(
     ]
 
 
-# ─────────────────────────────────────────────
+
 # Approve or Reject Leave (Admin Only)
 @router.put("/{leave_id}/{action}")
 def update_leave_status(
@@ -179,8 +179,6 @@ def update_leave_status(
 
     return {"message": f"Leave {action}d successfully", "leave_id": leave.id}
 
-
-# ─────────────────────────────────────────────
 # Monthly Leave Summary (Admin Only)
 @router.get("/summary/{year}/{month}")
 def get_monthly_summary(

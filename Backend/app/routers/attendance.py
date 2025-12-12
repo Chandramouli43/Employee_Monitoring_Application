@@ -6,7 +6,7 @@ from typing import Optional, List
 from sqlalchemy import func
 from app.core.database import SessionLocal
 from app.models.attendance import Attendance
-from app.models.leave import Leave          # ✅ added to cross-check leave
+from app.models.leave import Leave         
 from app.models.employee import Employee
 from app.utils.auth import get_current_user
 from app.schemas.attendance import AttendanceResponse
@@ -21,7 +21,7 @@ def punch_in(
 ):
     today = datetime.now(timezone.utc).date()
 
-    # 🚫 Check if user is on approved or pending leave
+    # Check if user is on approved or pending leave
     on_leave = (
         db.query(Leave)
         .filter(
@@ -41,7 +41,7 @@ def punch_in(
         .first()
     )
 
-    # 🚫 Block punching if marked 'On Leave'
+    # Block punching if marked 'On Leave'
     if existing and existing.status == "On Leave":
         raise HTTPException(status_code=400, detail="Cannot punch in while on leave.")
     if existing:
@@ -58,7 +58,7 @@ def punch_in(
     db.refresh(record)
     return record
 
-# ─────────────────────────────────────────────
+
 # Punch OUT (blocked if on leave)
 @router.post("/punch_out", response_model=AttendanceResponse)
 def punch_out(
@@ -67,7 +67,7 @@ def punch_out(
 ):
     today = datetime.now(timezone.utc).date()
 
-    # 🚫 Block if leave exists
+    # Block if leave exists
     on_leave = (
         db.query(Leave)
         .filter(
@@ -101,7 +101,7 @@ def punch_out(
     db.refresh(record)
     return record
 
-# ─────────────────────────────────────────────
+
 # Get today's attendance
 @router.get("/today", response_model=AttendanceResponse)
 def get_today_attendance(
@@ -149,7 +149,7 @@ def get_today_attendance(
 
     return record
 
-# ─────────────────────────────────────────────
+
 # Attendance summary for employee
 @router.get("/summary", response_model=List[AttendanceResponse])
 def get_summary(

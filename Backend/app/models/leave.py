@@ -6,8 +6,8 @@ class Leave(Base):
     __tablename__ = "leaves"
 
     id = Column(Integer, primary_key=True, index=True)
-    employee_id = Column(Integer, ForeignKey("employee.id", ondelete="CASCADE"))  # ✅ FIXED
-    approved_by = Column(Integer, ForeignKey("employee.id", ondelete="SET NULL"), nullable=True)  # ✅ optional
+    employee_id = Column(Integer, ForeignKey("employee.id", ondelete="CASCADE")) 
+    approved_by = Column(Integer, ForeignKey("employee.id", ondelete="SET NULL"), nullable=True) 
 
     leave_type = Column(String, nullable=False)
     start_date = Column(Date, nullable=False)

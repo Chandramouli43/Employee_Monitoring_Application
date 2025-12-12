@@ -11,9 +11,8 @@ from app.utils.auth import get_current_user
 
 router = APIRouter(prefix="/activities", tags=["activities"])
 
-# ---------------------------
 # Log / Create activity
-# ---------------------------
+
 @router.post("/", response_model=ActivityResponse, status_code=status.HTTP_201_CREATED)
 def create_activity(
     activity: ActivityCreate,
@@ -33,9 +32,8 @@ def create_activity(
     db.refresh(new_activity)
     return new_activity
 
-# ---------------------------
 # Get logged-in employee's activities
-# ---------------------------
+
 @router.get("/me", response_model=List[ActivityResponse])
 def get_my_activities(
     db: Session = Depends(get_db),
@@ -48,9 +46,9 @@ def get_my_activities(
         .all()
     )
 
-# ---------------------------
+
 # Get activities by employee (optional date range)
-# ---------------------------
+
 @router.get("/employee/{employee_id}", response_model=List[ActivityResponse])
 def get_activities_by_employee(
     employee_id: int,

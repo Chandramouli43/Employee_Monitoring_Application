@@ -7,12 +7,7 @@ class Attendance(Base):
     __tablename__ = "attendance"
 
     id = Column(Integer, primary_key=True, index=True)
-    employee_id = Column(
-        Integer,
-        ForeignKey("employee.id", ondelete="CASCADE"),
-        nullable=False,
-        index=True
-    )
+    employee_id = Column(Integer,ForeignKey("employee.id", ondelete="CASCADE"),nullable=False,index=True)
 
     # Core fields
     date = Column(Date, nullable=False, default=func.current_date())

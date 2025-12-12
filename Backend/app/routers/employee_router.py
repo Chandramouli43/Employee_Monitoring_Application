@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, status, Form
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, selectinload
 from pathlib import Path
 from typing import Optional, List
 import shutil
@@ -14,64 +14,123 @@ from app.services.employee_service import (
     update_profile,
 )
 from app.utils.auth import require_roles, get_current_user
+from app.models.employee import Employee
 
-router = APIRouter(prefix="/employees", tags=["employees"])  # ✅ put prefix here
+router = APIRouter(prefix="/employees", tags=["employees"])
 
 
-# ---------------------------
-# Admin-only: create new employee
-# ---------------------------
+# ====================================================
+# Helper function to inject required fields
+# ====================================================
+def attach_extra_fields(emp: Employee):
+    emp.department_name = emp.department.name if emp.department else None
+    emp.team_name = emp.team.name if emp.team else None
+    return emp
+
+
+# ====================================================
+# Create new employee
+# ====================================================
 @router.post("/", response_model=EmployeeResponse, status_code=status.HTTP_201_CREATED)
 def register_employee(
     employee: EmployeeCreate,
     db: Session = Depends(get_db),
     _: object = Depends(require_roles("Admin")),
 ):
-    print(employee,"iam employee")
     existing = get_employee_by_email(db, employee.email)
     if existing:
         raise HTTPException(status_code=400, detail="Email already exists")
-    return create_employee(db, employee)
+    emp = create_employee(db, employee)
+    return attach_extra_fields(emp)
 
 
-# ---------------------------
+# ====================================================
 # Get own profile
-# ---------------------------
+# ====================================================
 @router.get("/me", response_model=EmployeeResponse)
-def read_own_profile(current_user=Depends(get_current_user)):
-    return current_user
+def read_own_profile(
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user)
+):
+    user = (
+        db.query(Employee)
+        .options(
+            selectinload(Employee.attendances),
+            selectinload(Employee.leaves),
+            selectinload(Employee.activities),
+            selectinload(Employee.productivity),
+            selectinload(Employee.screenshots),
+            selectinload(Employee.alerts),
+            selectinload(Employee.department),
+            selectinload(Employee.team),
+        )
+        .filter(Employee.id == current_user.id)
+        .first()
+    )
+
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    return attach_extra_fields(user)
 
 
-# ---------------------------
-# List all employees (Admin-only)
-# ---------------------------
+# ====================================================
+# List all employees
+# ====================================================
 @router.get("/", response_model=List[EmployeeResponse])
 def list_all_employees(
     db: Session = Depends(get_db),
     _: object = Depends(require_roles("Admin")),
 ):
-    from app.models.employee import Employee
-    return db.query(Employee).all()
+    employees = (
+        db.query(Employee)
+        .options(
+            selectinload(Employee.attendances),
+            selectinload(Employee.leaves),
+            selectinload(Employee.activities),
+            selectinload(Employee.productivity),
+            selectinload(Employee.screenshots),
+            selectinload(Employee.alerts),
+            selectinload(Employee.department),
+            selectinload(Employee.team),
+        )
+        .all()
+    )
+
+    return [attach_extra_fields(e) for e in employees]
 
 
-# ---------------------------
-# Get employee by ID (Admin-only)
-# ---------------------------
+# Get employee by ID
+
 @router.get("/{emp_id}", response_model=EmployeeResponse)
 def get_employee(
     emp_id: int,
     db: Session = Depends(get_db),
     _: object = Depends(require_roles("Admin")),
 ):
-    emp = get_employee_by_id(db, emp_id)
+    emp = (
+        db.query(Employee)
+        .options(
+            selectinload(Employee.attendances),
+            selectinload(Employee.leaves),
+            selectinload(Employee.activities),
+            selectinload(Employee.productivity),
+            selectinload(Employee.alerts),
+            selectinload(Employee.department),
+            selectinload(Employee.team),
+        )
+        .filter(Employee.id == emp_id)
+        .first()
+    )
+
     if not emp:
         raise HTTPException(status_code=404, detail="Employee not found")
-    return emp
+
+    return attach_extra_fields(emp)
 
 
-# ---------------------------
-# Update employee by ID (Admin-only) — supports file upload
-# ---------------------------
+# Update employee by ID
+
 @router.patch("/{emp_id}", response_model=EmployeeResponse)
 def update_employee(
     emp_id: int,
@@ -114,4 +173,5 @@ def update_employee(
         picture_path = str(dest.relative_to(Path.cwd()))
 
     updated_emp = update_profile(db, emp, update_data, picture_path)
-    return updated_emp
+
+    return attach_extra_fields(updated_emp)

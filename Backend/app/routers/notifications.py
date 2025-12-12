@@ -1,43 +1,54 @@
-from fastapi import APIRouter, Depends, HTTPException 
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-import app.models
-import app.core.database as database
 from datetime import date
-from app.schemas.projects import Notification, NotificationCreate
+
+from app.core.database import get_db
+from app.models.notification import Notification  # Model
+from app.schemas.projects import NotificationCreate, Notification as NotificationSchema  # Schema
 
 router = APIRouter(prefix="/notificationmanagement", tags=["Notification Management"])
 
-get_db = database.get_db
-@router.post("/", response_model=Notification)
-def create_notification(note: NotificationCreate, db: Session = Depends(database.get_db)):
-    new_note = app.models.Notification(**note.dict(), created_at=date.today())
+
+# CREATE
+@router.post("/", response_model=NotificationSchema)
+def create_notification(note: NotificationCreate, db: Session = Depends(get_db)):
+    new_note = Notification(
+        message=note.message,
+        is_read=False,
+        created_at=date.today()
+    )
     db.add(new_note)
     db.commit()
     db.refresh(new_note)
     return new_note
 
-@router.get("/", response_model=list[Notification])
-def get_notifications(db: Session = Depends(database.get_db)):
-    return db.query(app.models.Notification).all()
 
-# 🟡 Update notification
-@router.put("/{notification_id}", response_model=Notification)
+# READ ALL
+@router.get("/", response_model=list[NotificationSchema])
+def get_notifications(db: Session = Depends(get_db)):
+    return db.query(Notification).all()
+
+
+# UPDATE
+@router.put("/{notification_id}", response_model=NotificationSchema)
 def update_notification(notification_id: int, request: NotificationCreate, db: Session = Depends(get_db)):
-    notification = db.query(app.models.Notification).filter(app.models.Notification.id == notification_id).first()
+    notification = db.query(Notification).filter(Notification.id == notification_id).first()
     if not notification:
         raise HTTPException(status_code=404, detail="Notification not found")
-    for key, value in request.dict().items():
-        setattr(notification, key, value)
+
+    notification.message = request.message
     db.commit()
     db.refresh(notification)
     return notification
 
-# 🔴 Delete notification
+
+# DELETE
 @router.delete("/{notification_id}")
 def delete_notification(notification_id: int, db: Session = Depends(get_db)):
-    notification = db.query(app.models.Notification).filter(app.models.Notification.id == notification_id).first()
+    notification = db.query(Notification).filter(Notification.id == notification_id).first()
     if not notification:
         raise HTTPException(status_code=404, detail="Notification not found")
+
     db.delete(notification)
     db.commit()
     return {"message": "Notification deleted successfully"}

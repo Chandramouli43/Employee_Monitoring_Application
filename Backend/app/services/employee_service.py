@@ -7,22 +7,18 @@ from passlib.context import CryptContext
 from app.models.employee import Employee
 from app.models.department import Department
 from app.models.team import Team
-from app.schemas.employee import EmployeeCreate, EmployeeUpdate
+from app.schemas.employee_schema import EmployeeCreate, EmployeeUpdate
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-# ---------------------------
-# Password utils
-# ---------------------------
+
 def get_password_hash(password: str) -> str:
     return pwd_context.hash(password)
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     return pwd_context.verify(plain_password, hashed_password)
 
-# ---------------------------
-# Employee CRUD (Sync)
-# ---------------------------
+
 def create_employee(db: Session, employee_data: dict) -> Employee:
     """Create a new employee synchronously."""
     # Hash password

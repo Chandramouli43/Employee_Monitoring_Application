@@ -5,7 +5,7 @@ from app.core.config import DATABASE_URL
 # Detect SQLite for connect_args
 connect_args = {"check_same_thread": False} if DATABASE_URL.startswith("sqlite") else {}
 
-# ✅ Reliable engine with pre-ping and pooling
+#  Reliable engine with pre-ping and pooling
 engine = create_engine(
     DATABASE_URL,
     connect_args=connect_args,

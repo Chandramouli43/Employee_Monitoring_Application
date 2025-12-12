@@ -25,24 +25,11 @@ class Employee(Base):
     team = relationship("Team", back_populates="employees")
 
     # Attendance Relationship
-    attendances = relationship(
-        "Attendance",
-        back_populates="employee",
-        cascade="all, delete-orphan"
-    )
+    attendances = relationship("Attendance",back_populates="employee",cascade="all, delete-orphan")
 
     # Leave Relationships
-    leaves = relationship(
-        "Leave",
-        foreign_keys="[Leave.employee_id]",
-        back_populates="employee",
-        cascade="all, delete-orphan"
-    )
-    approved_leaves = relationship(
-        "Leave",
-        foreign_keys="[Leave.approved_by]",
-        viewonly=True
-    )
+    leaves = relationship("Leave",foreign_keys="[Leave.employee_id]",back_populates="employee",cascade="all, delete-orphan")
+    approved_leaves = relationship("Leave",foreign_keys="[Leave.approved_by]",viewonly=True)
 
     # Activity and productivity tracking
     activities = relationship("Activity", back_populates="employee", cascade="all, delete-orphan")

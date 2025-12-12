@@ -2,9 +2,7 @@ from pydantic import BaseModel, EmailStr
 from typing import Optional
 from datetime import datetime
 
-# ==========================
-# Employee Schemas
-# ==========================
+
 class EmployeeBase(BaseModel):
     first_name: str
     last_name: Optional[str] = None
@@ -43,17 +41,14 @@ class EmployeeRead(EmployeeBase):
     class Config:
         from_attributes = True
 
-# ==========================
-# Productivity Schemas
-# ==========================
 class ProductivityBase(BaseModel):
     employee_id: int
-    period: Optional[str] = None           # e.g., "2025-10" or "2025-10-21"
+    period: Optional[str] = None           
     average_score: Optional[float] = 0.0
     tasks_completed: Optional[int] = 0
     hours_logged: Optional[float] = 0.0
-    score: Optional[float] = None          # single score if needed
-    timestamp: Optional[datetime] = None   # optional timestamp
+    score: Optional[float] = None          
+    timestamp: Optional[datetime] = None   
 
 class ProductivityCreate(ProductivityBase):
     pass
@@ -65,9 +60,7 @@ class ProductivityResponse(ProductivityBase):
     class Config:
         from_attributes = True
 
-# ---------------------------
-# Aggregate / summary metrics
-# ---------------------------
+
 class SummaryMetrics(BaseModel):
     overall_score: float
     average_hours: float

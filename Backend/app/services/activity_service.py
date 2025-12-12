@@ -13,9 +13,7 @@ from sqlalchemy.orm import Session
 from app.models.activity import Activity
 from app.schemas.activity import ActivityCreate
 
-# ==================================================
-# 🔹 ASYNC FUNCTIONS (for AsyncSession usage)
-# ==================================================
+
 
 async def create_activity(db: AsyncSession, act_in: ActivityCreate) -> Activity:
     """Create a new activity record (async)."""
@@ -29,7 +27,7 @@ async def create_activity(db: AsyncSession, act_in: ActivityCreate) -> Activity:
         metadata=act_in.metadata,
     )
     db.add(act)
-    await db.flush()  # async flush instead of commit
+    await db.flush()  
     return act
 
 async def list_activities(db: AsyncSession, skip: int = 0, limit: int = 100) -> List[Activity]:
@@ -56,9 +54,6 @@ async def list_activities_by_employee(
     q = await db.execute(stmt.order_by(Activity.start_at.desc()))
     return q.scalars().all()
 
-# ==================================================
-# 🔹 SYNC FUNCTIONS (for Session usage)
-# ==================================================
 
 def log_activity(db: Session, activity: ActivityCreate) -> Activity:
     """Record employee activity (sync)."""

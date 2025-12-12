@@ -10,12 +10,12 @@ router = APIRouter(prefix="/taskmanagement", tags=["Task Management"])
 
 get_db = database.get_db
 
-# 🟢 Get all tasks
+
 @router.get("/", response_model=List[Task])
 def get_tasks(db: Session = Depends(get_db)):
     return db.query(app.models.Task).all()
 
-# 🟢 Create a new task
+
 @router.post("/", response_model=Task)
 def create_task(request: TaskCreate, db: Session = Depends(get_db)):
     new_task = app.models.Task(**request.dict())
@@ -24,7 +24,7 @@ def create_task(request: TaskCreate, db: Session = Depends(get_db)):
     db.refresh(new_task)
     return new_task
 
-# 🟡 Update task
+
 @router.put("/{task_id}", response_model=Task)
 def update_task(task_id: int, request: TaskCreate, db: Session = Depends(get_db)):
     task = db.query(app.models.Task).filter(app.models.Task.id == task_id).first()
@@ -36,7 +36,6 @@ def update_task(task_id: int, request: TaskCreate, db: Session = Depends(get_db)
     db.refresh(task)
     return task
 
-# 🔴 Delete task
 @router.delete("/{task_id}")
 def delete_task(task_id: int, db: Session = Depends(get_db)):
     task = db.query(app.models.Task).filter(app.models.Task.id == task_id).first()

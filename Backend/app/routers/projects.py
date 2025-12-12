@@ -21,7 +21,7 @@ def create_project(project: ProjectCreate, db: Session = Depends(database.get_db
 def get_projects(db: Session = Depends(database.get_db)):
     return db.query(app.models.Project).all()
 
-# 🟡 Update project
+
 @router.put("/{project_id}", response_model=Project)
 def update_project(project_id: int, request: ProjectCreate, db: Session = Depends(get_db)):
     project = db.query(app.models.Project).filter(app.models.Project.id == project_id).first()
@@ -33,7 +33,7 @@ def update_project(project_id: int, request: ProjectCreate, db: Session = Depend
     db.refresh(project)
     return project
 
-# 🔴 Delete project
+
 @router.delete("/{project_id}")
 def delete_project(project_id: int, db: Session = Depends(get_db)):
     project = db.query(app.models.Project).filter(app.models.Project.id == project_id).first()

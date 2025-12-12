@@ -62,16 +62,14 @@ async def compute_and_store_productivity(db: AsyncSession, period: Optional[str]
 
 async def get_productivity_by_employee(db: AsyncSession, employee_id: int) -> List[Productivity]:
     """Get productivity records for a specific employee asynchronously."""
-    q = await db.execute(
+    q = db.execute(
         select(Productivity)
         .where(Productivity.employee_id == employee_id)
         .order_by(Productivity.created_at.desc())
     )
     return q.scalars().all()
 
-# ==================================================
-# 🔹 SYNC FUNCTIONS (Session)
-# ==================================================
+
 
 def calculate_employee_productivity(db: Session, employee_id: int) -> Productivity:
     """

@@ -7,9 +7,6 @@ from app.core.config import SECRET_KEY, ALGORITHM
 
 router = APIRouter(prefix="/realtime", tags=["realtime"])
 
-# ==============================================================
-# 🔹 1. Connection Manager (handles WebSocket connections)
-# ==============================================================
 class ConnectionManager:
     def __init__(self):
         self.active_connections: List[WebSocket] = []
@@ -31,9 +28,7 @@ class ConnectionManager:
 
 manager = ConnectionManager()
 
-# ==============================================================
-# 🔹 2. Try connecting to Redis (fallback if not running)
-# ==============================================================
+
 redis_client = None
 
 async def init_redis():
@@ -41,17 +36,15 @@ async def init_redis():
     try:
         redis_client = aioredis.from_url("redis://localhost:6379", decode_responses=True)
         await redis_client.ping()
-        print("✅ Connected to Redis")
+        print(" Connected to Redis")
     except Exception:
-        print("⚠️ Redis not running — using in-memory fallback.")
+        print(" Redis not running — using in-memory fallback.")
         redis_client = None
 
-# ==============================================================
-# 🔹 3. WebSocket endpoint with JWT Authentication
-# ==============================================================
+
 @router.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
-    # 🔒 JWT validation on connect
+    #  JWT validation on connect
     token = websocket.query_params.get("token")
     if not token:
         await websocket.close(code=4001)
@@ -66,7 +59,7 @@ async def websocket_endpoint(websocket: WebSocket):
         await websocket.close(code=4002)
         return
 
-    # ✅ Accept connection
+    # Accept connection
     await manager.connect(websocket)
     user_channel = f"stream:{email}"
 
@@ -83,7 +76,7 @@ async def websocket_endpoint(websocket: WebSocket):
             else:
                 await manager.broadcast(data)
 
-            # 🕐 Throttle frame rate (1 frame/second)
+            #  Throttle frame rate (1 frame/second)
             await asyncio.sleep(1)
 
     except WebSocketDisconnect:
@@ -92,9 +85,7 @@ async def websocket_endpoint(websocket: WebSocket):
         print("WebSocket Error:", e)
         await websocket.close()
 
-# ==============================================================
-# 🔹 4. Redis subscriber task (handles multi-instance sync)
-# ==============================================================
+
 async def redis_subscriber():
     if not redis_client:
         return
@@ -105,9 +96,7 @@ async def redis_subscriber():
             data = json.loads(message["data"])
             await manager.broadcast(data)
 
-# ==============================================================
-# 🔹 5. Startup event to initialize Redis and background task
-# ==============================================================
+
 @router.on_event("startup")
 async def on_startup():
     await init_redis()

@@ -9,9 +9,9 @@ from app.models.activity import Activity
 
 router = APIRouter(prefix="/analytics", tags=["analytics"])
 
-# ---------------------------
+
 # Employee Analytics
-# ---------------------------
+
 @router.get("/employee/{employee_id}")
 def employee_analytics(
     employee_id: int,

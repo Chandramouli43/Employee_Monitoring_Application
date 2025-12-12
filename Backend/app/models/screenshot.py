@@ -10,10 +10,10 @@ class Screenshot(Base):
     image_path = Column(String, nullable=False)
     timestamp = Column(DateTime(timezone=True), server_default=func.now())
 
-    # 🔗 Foreign keys
+    # Foreign keys
     employee_id = Column(Integer, ForeignKey("employee.id", ondelete="CASCADE"), nullable=False)
     department_id = Column(Integer, ForeignKey("departments.id", ondelete="SET NULL"), nullable=True)
 
-    # 🔗 Relationships
+    # Relationships
     employee = relationship("Employee", back_populates="screenshots")
     department = relationship("Department", back_populates="screenshots")

@@ -62,17 +62,17 @@ def combine_all_files(root_folder, output_file):
                 except Exception as e:
                     print(f"⚠ Could not read {file_path}: {e}")
 
-    print("\n✅ Task Completed Successfully!")
-    print(f"📂 Total files scanned: {total_files}")
-    print(f"✍ Files written to output: {written_files}")
-    print(f"📘 Output file created at: {output_file}")
+    print("\n Task Completed Successfully!")
+    print(f" Total files scanned: {total_files}")
+    print(f" Files written to output: {written_files}")
+    print(f" Output file created at: {output_file}")
 
 
 if __name__ == "__main__":
-    # 🔧 Change this path to your main root folder
+    #  Change this path to your main root folder
     root_folder = r"C:\Users\Dell\Documents\Work\Employee_Monitoring_Application\Backend\app\routers"
 
-    # 📄 Output file path (saved inside the same root folder)
+    # Output file path (saved inside the same root folder)
     output_file = os.path.join(root_folder, "all_folders_files_content.txt")
 
     combine_all_files(root_folder, output_file)

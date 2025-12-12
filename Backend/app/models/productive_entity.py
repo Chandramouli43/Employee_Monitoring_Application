@@ -10,7 +10,7 @@ class ProductiveEntity(Base):
     __tablename__ = "productive_entities"
 
     id = Column(Integer, primary_key=True, index=True)
-    name = Column(String(255), unique=True, nullable=False)  # e.g. "Chrome", "github.com"
+    name = Column(String(255), unique=True, nullable=False)  
     entity_type = Column(Enum(*ENTITY_TYPE_ENUM, name="entity_type_enum"), nullable=False)
-    productive = Column(Boolean, default=True, nullable=False)  # True => productive
+    productive = Column(Boolean, default=True, nullable=False)  
     created_at = Column(DateTime(timezone=True), server_default=func.now())

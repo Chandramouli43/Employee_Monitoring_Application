@@ -6,7 +6,7 @@ class NotificationSetting(Base):
     __tablename__ = "notification_settings"
 
     id = Column(Integer, primary_key=True, index=True)
-    name = Column(String(100), unique=True, nullable=False)   # e.g. "idle_time", "deadline_reminder"
+    name = Column(String(100), unique=True, nullable=False)
     enabled = Column(Boolean, default=True)
-    channel = Column(String(50), default="in_app")  # in_app, email, slack, etc.
+    channel = Column(String(50), default="in_app")  
                            

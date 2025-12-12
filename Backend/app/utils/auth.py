@@ -11,9 +11,7 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from app.core.database import get_db
 from app.services.employee_service import get_employee_by_email
 
-# ---------------------------
-# Config
-# ---------------------------
+
 SECRET_KEY = os.getenv("SECRET_KEY", "supersecretkey")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60
@@ -22,9 +20,7 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 60
 
 bearer_scheme = HTTPBearer(auto_error=False)  
 
-# ---------------------------
-# JWT Functions
-# ---------------------------
+
 def create_access_token(email: str, role: str, expires_delta: Optional[timedelta] = None) -> str:
     """
     Create a JWT access token containing both email and role.
@@ -46,9 +42,7 @@ def get_current_user(
     Returns the authenticated user object.
     """
 
-    # ------------------------------------------------------------------
-    # 1️⃣ Extract token from Header OR Cookie
-    # ------------------------------------------------------------------
+    
     token = None
 
     if bearer and bearer.credentials:
@@ -59,9 +53,7 @@ def get_current_user(
     if not token:
         raise HTTPException(status_code=401, detail="Not authenticated")
 
-    # ------------------------------------------------------------------
-    # 2️⃣ Decode JWT
-    # ------------------------------------------------------------------
+    
     credentials_exception = HTTPException(
         status_code=401, detail="Could not validate credentials"
     )
@@ -77,29 +69,19 @@ def get_current_user(
     except JWTError:
         raise credentials_exception
 
-    # ------------------------------------------------------------------
-    # 3️⃣ Lookup user in DB
-    # ------------------------------------------------------------------
+ 
     user = get_employee_by_email(db, email)
 
     if not user:
         raise credentials_exception
 
-    # ------------------------------------------------------------------
-    # 4️⃣ Keep role in sync (optional behavior you had)
-    # ------------------------------------------------------------------
     if role and user.role != role:
         print(f"Syncing role for user {email}: {user.role} -> {role}")
         user.role = role
 
-    # ------------------------------------------------------------------
-    # 5️⃣ Return the database user object (same as your original logic)
-    # ------------------------------------------------------------------
     return user
 
-# ---------------------------
-# Role-based Dependency
-# ---------------------------
+
 def require_roles(*roles: str):
     """
     Dependency to require specific roles for a route.
