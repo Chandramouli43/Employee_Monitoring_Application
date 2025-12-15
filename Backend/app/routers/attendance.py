@@ -13,6 +13,15 @@ from app.schemas.attendance import AttendanceResponse
 from app.core.database import get_db
 
 router = APIRouter(prefix="/attendance", tags=["Attendance Management"])
+
+def calculate_hours(login_time: datetime, logout_time: datetime) -> str:
+    """Calculate hours and minutes between login and logout times."""
+    if not login_time or not logout_time:
+        return "0h 0m"
+    delta = logout_time - login_time
+    hours = delta.seconds // 3600
+    minutes = (delta.seconds % 3600) // 60
+    return f"{hours}h {minutes}m"
 # Punch IN (blocked if on leave)
 @router.post("/punch_in", response_model=AttendanceResponse)
 def punch_in(
