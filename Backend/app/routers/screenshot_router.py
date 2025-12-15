@@ -19,24 +19,29 @@ UPLOAD_PATH.mkdir(parents=True, exist_ok=True)
 
 
 @router.post("/", response_model=ScreenshotResponse)
-def upload_screenshot(file: UploadFile = File(...), db: Session = Depends(get_db), current_user=Depends(get_current_user)):
-    """Upload screenshot captured by monitoring agent."""
-    file_path = UPLOAD_PATH / f" {file.filename}"
+def upload_screenshot(
+    file: UploadFile = File(...),
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user)
+):
+    filename = Path(file.filename).name.strip()  # ✅ sanitize
+
+    file_path = UPLOAD_PATH / filename
     with open(file_path, "wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
+        print(f"Saved file to {file_path}")
 
     screenshot = Screenshot(
         employee_id=current_user.id,
         department_id=current_user.department_id,
-        image_path=str(file_path),
+        image_path=f"uploads/screenshots/{filename}",  # ✅ URL-safe
         timestamp=datetime.utcnow()
     )
+
     db.add(screenshot)
     db.commit()
     db.refresh(screenshot)
     return screenshot
-
-
 
 @router.get(
     "/{employee_id}",
