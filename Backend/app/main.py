@@ -3,7 +3,7 @@ from fastapi import FastAPI
 from sqlalchemy.orm import Session
 from app.core.database import Base, engine, SessionLocal
 from fastapi.middleware.cors import CORSMiddleware
-from app.models import employee, department, team, activity, productivity, screenshot
+from app.models import employee, department, team, activity, productivity, screenshot,project,task
 from app.services.employee_service import create_employee, get_employee_by_email
 from app.schemas.employee_schema import EmployeeCreate
 from app.routers import (
