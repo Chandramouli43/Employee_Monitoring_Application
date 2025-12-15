@@ -6,7 +6,7 @@ class Team(Base):
     __tablename__ = "teams"
 
     id = Column(Integer, primary_key=True, index=True)
-    team_name = Column(String(120), nullable=False)
+    name = Column(String(120), nullable=False)
     department_id = Column(Integer, ForeignKey("departments.id", ondelete="CASCADE"), nullable=False)
 
     # Relationships

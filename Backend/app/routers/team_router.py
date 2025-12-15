@@ -21,7 +21,7 @@ def create_team(
         if not db.query(Department).filter(Department.id == team_in.department_id).first():
             raise HTTPException(status_code=400, detail="Department not found")
 
-    team = Team(team_name=team_in.team_name, department_id=team_in.department_id)
+    team = Team(name=team_in.name, department_id=team_in.department_id)
     db.add(team)
     db.commit()
     db.refresh(team)

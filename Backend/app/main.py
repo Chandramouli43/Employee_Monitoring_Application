@@ -28,6 +28,7 @@ from app.routers import (
     admin_config_router,
     admin_reports_router,
 )
+from fastapi.staticfiles import StaticFiles
 
 # ---------------------------
 # Create tables if they don't exist
@@ -49,6 +50,15 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+
+app.mount(
+    "/uploads",
+    StaticFiles(directory="uploads"),
+    name="uploads",
+)
+
 # ---------------------------
 # Include Routers
 # ---------------------------

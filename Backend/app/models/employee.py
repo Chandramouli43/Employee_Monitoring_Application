@@ -8,7 +8,6 @@ class Employee(Base):
     id = Column(Integer, primary_key=True, index=True)
     first_name = Column(String(120), nullable=False)
     last_name = Column(String(120))
-    name = Column(String(240))
     email = Column(String(200), unique=True, index=True, nullable=False)
     password = Column(String, nullable=False)
     role = Column(String(50), default="Employee")  # Employee, Manager, HR, Admin

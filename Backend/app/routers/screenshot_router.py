@@ -3,7 +3,9 @@ from sqlalchemy.orm import Session
 from datetime import datetime
 from pathlib import Path
 import shutil
-
+from typing import List
+from fastapi import Query
+from app.utils.auth import require_roles
 from app.core.config import UPLOAD_DIR
 from app.core.database import get_db
 from app.models.screenshot import Screenshot
@@ -19,7 +21,7 @@ UPLOAD_PATH.mkdir(parents=True, exist_ok=True)
 @router.post("/", response_model=ScreenshotResponse)
 def upload_screenshot(file: UploadFile = File(...), db: Session = Depends(get_db), current_user=Depends(get_current_user)):
     """Upload screenshot captured by monitoring agent."""
-    file_path = UPLOAD_PATH / f"{current_user.id}_{datetime.utcnow().strftime('%Y%m%d_%H%M%S')}_{file.filename}"
+    file_path = UPLOAD_PATH / f" {file.filename}"
     with open(file_path, "wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
 
@@ -35,7 +37,32 @@ def upload_screenshot(file: UploadFile = File(...), db: Session = Depends(get_db
     return screenshot
 
 
-@router.get("/me", response_model=list[ScreenshotResponse])
-def get_my_screenshots(db: Session = Depends(get_db), current_user=Depends(get_current_user)):
-    """Fetch logged-in employee's captured screenshots."""
-    return db.query(Screenshot).filter(Screenshot.employee_id == current_user.id).order_by(Screenshot.timestamp.desc()).all()
+
+@router.get(
+    "/{employee_id}",
+    response_model=List[ScreenshotResponse],
+)
+def get_employee_screenshots(
+    employee_id: int,
+    page: int = Query(1, ge=1),
+    limit: int = Query(15, le=50),
+    db: Session = Depends(get_db),
+    _: object = Depends(require_roles("Admin")),
+):
+    """
+    Fetch screenshots for an employee with pagination.
+    Default: first 15 screenshots.
+    """
+
+    offset = (page - 1) * limit
+
+    screenshots = (
+        db.query(Screenshot)
+        .filter(Screenshot.employee_id == employee_id)
+        .order_by(Screenshot.timestamp.desc())
+        .offset(offset)
+        .limit(limit)
+        .all()
+    )
+
+    return screenshots

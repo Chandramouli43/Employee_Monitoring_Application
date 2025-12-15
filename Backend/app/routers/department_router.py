@@ -10,7 +10,7 @@ from app.models.department import Department
 from app.utils.auth import require_roles
 
 router = APIRouter(prefix="/departments", tags=["Departments"])
-
+ 
 
 # -----------------------------------------
 # CREATE DEPARTMENT (Admin only)
@@ -23,13 +23,13 @@ def create_department(
 ):
     existing = (
         db.query(Department)
-        .filter(Department.department_name == dept.department_name)
+        .filter(Department.name == dept.name)
         .first()
     )
     if existing:
         raise HTTPException(status_code=400, detail="Department already exists")
 
-    new_dept = Department(department_name=dept.department_name)
+    new_dept = Department(name=dept.name)
     db.add(new_dept)
     db.commit()
     db.refresh(new_dept)
@@ -57,7 +57,7 @@ def update_department(
     if not existing:
         raise HTTPException(status_code=404, detail="Department not found")
 
-    existing.department_name = dept.department_name
+    existing.name = dept.name
 
     db.commit()
     db.refresh(existing)

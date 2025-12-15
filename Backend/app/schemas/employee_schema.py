@@ -104,3 +104,32 @@ class EmployeeResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+from pydantic import BaseModel, EmailStr
+from typing import Optional
+
+class EmployeeListResponse(BaseModel):
+    id: int
+    first_name: str
+    last_name: Optional[str]
+    email: EmailStr
+    role: str
+
+    contact: Optional[str]
+    designation: Optional[str]
+
+    department_id: Optional[int]
+    department_name: Optional[str]
+
+    team_id: Optional[int]
+    team_name: Optional[str]
+
+    is_active: bool
+
+    productivity_score: float = 0
+    tasks_completed: int = 0
+    hours_logged: float = 0
+
+    class Config:
+        from_attributes = True
